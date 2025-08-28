@@ -1,0 +1,15 @@
+mat-card {
+  max-width: 400px;
+  margin: 12rem auto 2rem;
+  padding: 2rem;
+}
+
+.error {
+  color: hsl(0, 100%, 62%);
+  margin-top: 1rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}

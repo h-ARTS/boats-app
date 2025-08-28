@@ -1,0 +1,32 @@
+<mat-card appearance="outlined">
+  @if (!loading()) {
+  <form class="form" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <h2>Login</h2>
+    <mat-form-field class="form-field" appearance="outline">
+      <mat-label>Username</mat-label>
+      <input matInput formControlName="username" autocomplete="username" type="username" required />
+    </mat-form-field>
+    <mat-form-field class="form-field" appearance="outline">
+      <mat-label>Password</mat-label>
+      <input
+        matInput
+        formControlName="password"
+        autocomplete="current-password"
+        type="password"
+        required
+      />
+    </mat-form-field>
+
+    <button matButton="filled" color="primary" type="submit" [disabled]="form.invalid || loading()">
+      Login
+    </button>
+    @if (error()) {
+    <div class="error">{{ error() }}</div>
+    }
+  </form>
+  } @else {
+  <div class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+  }
+</mat-card>
