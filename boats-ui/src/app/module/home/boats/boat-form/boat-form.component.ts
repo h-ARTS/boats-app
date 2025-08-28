@@ -2,13 +2,13 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { inject } from '@angular/core';
-import { BoatService } from '../../services/boat.service';
+import { BoatService } from '../services/boat.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-import { Boat } from '../../../../../shared/types';
+import { Boat } from '../../../../shared/types';
 
 @Component({
   selector: 'app-boat-form',

@@ -1,35 +1,31 @@
 <div class="action-buttons">
-  <button mat-stroked-button color="primary" (click)="goBack()">
+  <button matButton="tonal" color="primary" (click)="goBack()">
     <mat-icon>arrow_back</mat-icon>
     Back
   </button>
 
-  <button mat-stroked-button color="primary" (click)="goToEdit()">
+  <button matButton="tonal" color="primary" (click)="goToEdit()">
     <mat-icon>edit</mat-icon>
     Edit Boat
   </button>
 </div>
 
 <mat-card appearance="outlined">
-  @switch (view().kind) {
-    @case ('loading') {
+  @switch (view().kind) { @case ('loading') {
 
-      <div class="loading-container">
-        <mat-spinner diameter="50"></mat-spinner>
-      </div>
-    }
-    @case ('loaded') {
-      <mat-card-header>
-        <h2 class="header-title">{{ boat()!.name }}</h2>
-      </mat-card-header>
-      <mat-card-content>
-        <p><strong>Type:</strong> {{ boat()!.type }}</p>
-        <p><strong>Length:</strong> {{ boat()!.length }} m</p>
-        <p><strong>Description:</strong> {{ boat()!.description }}</p>
-      </mat-card-content>
-    }
-    @default {
-      <app-boat-not-found></app-boat-not-found>
-    }
-  }
+  <div class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+  } @case ('loaded') {
+  <mat-card-header>
+    <h2 class="header-title">{{ boat()!.name }}</h2>
+  </mat-card-header>
+  <mat-card-content>
+    <p><strong>Type:</strong> {{ boat()!.type }}</p>
+    <p><strong>Length:</strong> {{ boat()!.length }} m</p>
+    <p><strong>Description:</strong> {{ boat()!.description }}</p>
+  </mat-card-content>
+  } @default {
+  <app-boat-not-found></app-boat-not-found>
+  } }
 </mat-card>

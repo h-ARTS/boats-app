@@ -19,17 +19,13 @@ export const routes: Routes = [
     path: 'boats/add',
     canActivate: [() => inject(AuthGuard).canActivate()],
     loadComponent: () =>
-      import('./module/home/boats/components/boat-form/boat-form.component').then(
-        (m) => m.BoatFormComponent
-      ),
+      import('./module/home/boats/boat-form/boat-form.component').then((m) => m.BoatFormComponent),
   },
   {
     path: 'boats/edit/:id',
     canActivate: [() => inject(AuthGuard).canActivate()],
     loadComponent: () =>
-      import('./module/home/boats/components/boat-form/boat-form.component').then(
-        (m) => m.BoatFormComponent
-      ),
+      import('./module/home/boats/boat-form/boat-form.component').then((m) => m.BoatFormComponent),
   },
   {
     path: 'boats/detail/:id',
