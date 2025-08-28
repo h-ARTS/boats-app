@@ -3,6 +3,7 @@ package com.hanankhan.boatsapi.boats.service;
 import com.hanankhan.boatsapi.boats.dto.BoatDto;
 import com.hanankhan.boatsapi.boats.dto.BoatUpsertDto;
 import com.hanankhan.boatsapi.boats.entity.Boat;
+import com.hanankhan.boatsapi.boats.exception.NotFoundException;
 import com.hanankhan.boatsapi.boats.repository.BoatRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,8 @@ public class BoatService {
                 .map(boat -> new BoatDto(
                         boat.getId(),
                         boat.getName(),
+                        boat.getType(),
+                        boat.getLength(),
                         boat.getDescription(),
                         boat.getCreatedAt(),
                         boat.getUpdatedAt()
@@ -30,6 +33,8 @@ public class BoatService {
                 .map(boat -> new BoatDto(
                         boat.getId(),
                         boat.getName(),
+                        boat.getType(),
+                        boat.getLength(),
                         boat.getDescription(),
                         boat.getCreatedAt(),
                         boat.getUpdatedAt()
@@ -40,11 +45,15 @@ public class BoatService {
     public BoatDto createBoat(BoatUpsertDto boatDto) {
         var boat = new Boat();
         boat.setName(boatDto.name());
+        boat.setType(boatDto.type());
+        boat.setLength(boatDto.length());
         boat.setDescription(boatDto.description());
         var savedBoat = boatRepository.save(boat);
         return new BoatDto(
                 savedBoat.getId(),
                 savedBoat.getName(),
+                savedBoat.getType(),
+                savedBoat.getLength(),
                 savedBoat.getDescription(),
                 savedBoat.getCreatedAt(),
                 savedBoat.getUpdatedAt()
@@ -60,6 +69,8 @@ public class BoatService {
         return new BoatDto(
                 updatedBoat.getId(),
                 updatedBoat.getName(),
+                updatedBoat.getType(),
+                updatedBoat.getLength(),
                 updatedBoat.getDescription(),
                 updatedBoat.getCreatedAt(),
                 updatedBoat.getUpdatedAt()

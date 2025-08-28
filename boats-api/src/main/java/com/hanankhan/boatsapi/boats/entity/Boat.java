@@ -24,6 +24,12 @@ public class Boat {
     String name;
 
     @Column(nullable = false)
+    String type;
+
+    @Column(nullable = false)
+    Float length;
+
+    @Column(nullable = false)
     String description;
 
     @CreationTimestamp
