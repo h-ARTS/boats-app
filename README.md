@@ -65,6 +65,7 @@ When you log in successfully, a **JWT access token** is issued and stored in bro
     - Reactive forms with minimal validation
     - Angular Material components (table, form, buttons)
     - Minimal error handling for feedback
+    - Pagination
 - **Backend features**
     - REST endpoints under `/api/boats`
     - DTOs with validation
@@ -72,6 +73,7 @@ When you log in successfully, a **JWT access token** is issued and stored in bro
     - Global exception handler returning consistent JSON errors
     - Spring Security with stateless JWT filter
     - In-memory user for authentication
+    - Paginated endpoints with query params
 
 ---
 
