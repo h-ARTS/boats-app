@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal, computed } from '@angular/core';
 import { inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BoatService } from '../boats/services/boat.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,16 +20,12 @@ export class HomePage {
   private router = inject(Router);
   private auth = inject(AuthService);
 
-  boats = this.boatService.boats;
+  protected boats = this.boatService.boats;
 
-  displayedColumns = ['name', 'actions'];
+  protected displayedColumns = ['name', 'actions'];
 
   constructor() {
     this.boatService.loadBoats();
-  }
-
-  getBoats() {
-    this.boatService.getBoats().subscribe((bs) => this.boats.set(bs));
   }
 
   goToAdd() {
@@ -45,7 +41,7 @@ export class HomePage {
   }
 
   deleteBoat(id: number) {
-    this.boatService.deleteBoat(id).subscribe(() => this.getBoats());
+    this.boatService.deleteBoat(id);
   }
 
   logout() {

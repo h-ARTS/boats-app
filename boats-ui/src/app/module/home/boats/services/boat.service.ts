@@ -16,15 +16,15 @@ export class BoatService {
   private http = inject(HttpClient);
   private auth = inject(AuthService);
 
-  boats = signal<Boat[]>([]);
-  currentBoat = signal<Boat | null>(null);
+  private _boats = signal<Boat[]>([]);
+  boats = this._boats.asReadonly();
 
   loadBoats() {
     this.http
       .get<{ content: Boat[] }>(GET_BOATS, {
         headers: { Authorization: `Bearer ${this.auth.getToken()}` },
       })
-      .subscribe((data) => this.boats.set(data.content as Boat[]));
+      .subscribe((data) => this._boats.set(data.content as Boat[]));
   }
 
   fetchBoat(id: number): Observable<Boat | null> {
@@ -33,20 +33,14 @@ export class BoatService {
     });
   }
 
-  getBoats(): Observable<Boat[]> {
-    return of(this.boats());
-  }
-
   getBoat(id: number): Observable<Boat | null> {
-    const boat = this.boats().find((b) => b.id === id) ?? null;
+    const boat = this._boats().find((b) => b.id === id) ?? null;
     if (boat) {
-      this.currentBoat.set(boat);
       return of(boat);
     } else {
       return this.fetchBoat(id).pipe(
         map((b) => {
           if (b) {
-            this.currentBoat.set(b);
             return b;
           }
           return null;
@@ -63,13 +57,13 @@ export class BoatService {
         headers: { Authorization: `Bearer ${this.auth.getToken()}` },
       })
       .subscribe();
-    this.boats.update((bs) => [...bs, boat]);
+    this._boats.update((bs) => [...bs, boat]);
     return of(boat);
   }
 
   updateBoat(id: number, update: Partial<Boat>): Observable<Boat | null> {
     let updated: Boat | null = null;
-    this.boats.update((bs) =>
+    this._boats.update((bs) =>
       bs.map((b) => {
         if (b.id === id) {
           updated = { ...b, ...update };
@@ -86,13 +80,12 @@ export class BoatService {
     return of(updated);
   }
 
-  deleteBoat(id: number): Observable<boolean> {
-    this.boats.update((bs) => bs.filter((b) => b.id !== id));
+  deleteBoat(id: number) {
+    this._boats.update((bs) => bs.filter((b) => b.id !== id));
     this.http
       .delete(DELETE_BOAT.replace('{id}', id.toString()), {
         headers: { Authorization: `Bearer ${this.auth.getToken()}` },
       })
       .subscribe();
-    return of(true);
   }
 }
