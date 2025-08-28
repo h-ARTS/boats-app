@@ -9,6 +9,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @Service
 @RequiredArgsConstructor
@@ -60,21 +65,39 @@ public class BoatService {
         );
     }
 
-    public BoatDto updateBoat(Long id, BoatUpsertDto boatDto) {
+    @Transactional
+    public BoatDto updateBoat(Long id, BoatUpsertDto in) {
         var boat = boatRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Boat not found"));
-        boat.setName(boatDto.name());
-        boat.setDescription(boatDto.description());
-        var updatedBoat = boatRepository.save(boat);
+
+        boolean changed = false;
+
+        changed |= setIfDifferent(boat::getName, boat::setName, in.name());
+        changed |= setIfDifferent(boat::getDescription, boat::setDescription, in.description());
+        changed |= setIfDifferent(boat::getType, boat::setType, in.type());
+        changed |= setIfDifferent(boat::getLength, boat::setLength, in.length());
+
+        if (changed) {
+            boat = boatRepository.save(boat);
+        }
         return new BoatDto(
-                updatedBoat.getId(),
-                updatedBoat.getName(),
-                updatedBoat.getType(),
-                updatedBoat.getLength(),
-                updatedBoat.getDescription(),
-                updatedBoat.getCreatedAt(),
-                updatedBoat.getUpdatedAt()
+                boat.getId(),
+                boat.getName(),
+                boat.getType(),
+                boat.getLength(),
+                boat.getDescription(),
+                boat.getCreatedAt(),
+                boat.getUpdatedAt()
         );
+    }
+
+    private <T> boolean setIfDifferent(Supplier<T> getter, Consumer<T> setter, T newVal) {
+        T cur = getter.get();
+        if (!Objects.equals(cur, newVal)) {
+            setter.accept(newVal);
+            return true;
+        }
+        return false;
     }
 
     public void deleteBoat(Long id) {
