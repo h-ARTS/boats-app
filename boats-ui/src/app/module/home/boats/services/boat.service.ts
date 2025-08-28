@@ -19,7 +19,11 @@ export class BoatService {
   private _boats = signal<Boat[]>([]);
   boats = this._boats.asReadonly();
 
-  loadBoats() {
+  constructor() {
+    this.loadBoats();
+  }
+
+  private loadBoats() {
     this.http
       .get<{ content: Boat[] }>(GET_BOATS, {
         headers: { Authorization: `Bearer ${this.auth.getToken()}` },

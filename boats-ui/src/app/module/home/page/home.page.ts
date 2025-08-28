@@ -20,10 +20,6 @@ export class HomePage {
   private router = inject(Router);
   private auth = inject(AuthService);
 
-  constructor() {
-    this.boatService.loadBoats();
-  }
-
   goToAdd() {
     this.router.navigate(['/boats/add']);
   }
