@@ -34,7 +34,7 @@ public class BoatService {
                         boat.getCreatedAt(),
                         boat.getUpdatedAt()
                 ))
-                .orElseThrow(() -> new RuntimeException("Boat not found"));
+                .orElseThrow(() -> new NotFoundException("Boat not found"));
     }
 
     public BoatDto createBoat(BoatUpsertDto boatDto) {
@@ -53,7 +53,7 @@ public class BoatService {
 
     public BoatDto updateBoat(Long id, BoatUpsertDto boatDto) {
         var boat = boatRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Boat not found"));
+                .orElseThrow(() -> new NotFoundException("Boat not found"));
         boat.setName(boatDto.name());
         boat.setDescription(boatDto.description());
         var updatedBoat = boatRepository.save(boat);
@@ -68,7 +68,7 @@ public class BoatService {
 
     public void deleteBoat(Long id) {
         if (!boatRepository.existsById(id)) {
-            throw new RuntimeException("Boat not found");
+            throw new NotFoundException("Boat not found");
         }
         boatRepository.deleteById(id);
     }
