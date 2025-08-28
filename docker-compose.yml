@@ -1,4 +1,4 @@
-name: boats-dev
+name: boats-app
 services:
   api:
     build:
