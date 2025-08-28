@@ -5,6 +5,10 @@
 // custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
 
+:root {
+  --wave-color: #65c9ff;
+}
+
 html {
   @include mat.theme(
     (
