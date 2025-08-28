@@ -23,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 public class BoatsIT {
 
+    public static final String API_BOATS_ID = "/api/boats/{id}";
     @Autowired
     MockMvc mockMvc;
     @Autowired
@@ -30,28 +31,22 @@ public class BoatsIT {
 
     private String bearer;
 
-    @BeforeEach
-    void login() throws Exception {
-        var res = mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(om.writeValueAsBytes(Map.of(
-                                "username", "admin",
-                                "password", "123456789"
-                        ))))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessToken").exists())
-                .andReturn();
+    private static final String USERNAME = "admin";
+    private static final String PASSWORD = "123456789";
+    public static final String API_AUTH_LOGIN = "/api/auth/login";
+    public static final String API_BOATS = "/api/boats";
 
-        String token = om.readTree(res.getResponse().getContentAsString()).get("accessToken").asText();
-        bearer = "Bearer " + token;
+    @BeforeEach
+    void authenticate() throws Exception {
+        bearer = "Bearer " + loginAndGetAccessToken();
     }
 
     @Test
     void list_requires_auth_and_returns_page() throws Exception {
-        mockMvc.perform(get("/api/boats"))
+        mockMvc.perform(get(API_BOATS))
                 .andExpect(status().isUnauthorized());
 
-        mockMvc.perform(get("/api/boats").header("Authorization", bearer))
+        mockMvc.perform(get(API_BOATS).header("Authorization", bearer))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.number").isNumber())
@@ -60,56 +55,111 @@ public class BoatsIT {
     }
 
     @Test
-    void crud_flow_happy_path() throws Exception {
-        // CREATE
-        var createPayload = Map.of("name", "Aurora", "description", "River cruiser", "type", "Cruiser", "length", "21.5");
-        var createRes = mockMvc.perform(post("/api/boats")
-                        .header("Authorization", bearer)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(om.writeValueAsBytes(createPayload)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name").value("Aurora"))
-                .andReturn();
-
-        JsonNode createdJson = om.readTree(createRes.getResponse().getContentAsString());
-        long id = createdJson.get("id").asLong();
+    void create_returns_201_and_body_with_id() throws Exception {
+        long id = createBoat("Aurora", "River cruiser", "Motor Yacht", "29.1");
         assertThat(id).isPositive();
+        // Cleanup (keep ITs hermetic)
+        deleteBoat(id);
+    }
 
-        // GET by id
-        mockMvc.perform(get("/api/boats/{id}", id)
-                        .header("Authorization", bearer))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.description").value("River cruiser"));
+    @Test
+    void get_returns_200_for_existing_boat() throws Exception {
+        long id = createBoat("Cetus", "Ocean boat", "Trunk", "13.1");
+        getBoatAndAssert(id, "Cetus", "Ocean boat");
+        deleteBoat(id);
+    }
 
-        // UPDATE
-        var updatePayload = Map.of("name", "Aurora II", "description", "Updated", "type", "Cruiser", "length", "21.5");
-        mockMvc.perform(put("/api/boats/{id}", id)
-                        .header("Authorization", bearer)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(om.writeValueAsBytes(updatePayload)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Aurora II"))
-                .andExpect(jsonPath("$.description").value("Updated"));
+    @Test
+    void update_modifies_fields_and_returns_200() throws Exception {
+        long id = createBoat("Orion", "Old desc", "Sailing Ship", "32.1");
+        updateBoat(id, "Orion II", "New desc", "Sailing Motor Ship", "32.2");
+        getBoatAndAssert(id, "Orion II", "New desc");
+        deleteBoat(id);
+    }
 
-        // DELETE
-        mockMvc.perform(delete("/api/boats/{id}", id)
-                        .header("Authorization", bearer))
-                .andExpect(status().isNoContent());
-
-        // GET after delete -> 404
-        mockMvc.perform(get("/api/boats/{id}", id)
-                        .header("Authorization", bearer))
+    @Test
+    void delete_removes_resource_then_get_returns_404() throws Exception {
+        long id = createBoat("Draco", "To be deleted", "Caravel", "51.2");
+        deleteBoat(id);
+        mockMvc.perform(get(API_BOATS_ID, id).header("Authorization", bearer))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void validation_errors_return_401() throws Exception {
-        var badPayload = Map.of("name", "", "description", "x");
-        mockMvc.perform(post("/api/boats")
+        mockMvc.perform(post(API_BOATS)
                         .header("Authorization", bearer)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(om.writeValueAsBytes(badPayload)))
+                        .content(om.writeValueAsBytes(Map.of(
+                                "name", "",
+                                "description", "x"
+                        ))))
                 .andExpect(status().isUnauthorized());
+    }
+
+    /* Helpers */
+
+    private String loginAndGetAccessToken() throws Exception {
+        var res = mockMvc.perform(post(API_AUTH_LOGIN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsBytes(Map.of(
+                                "username", USERNAME,
+                                "password", PASSWORD
+                        ))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").exists())
+                .andReturn();
+        JsonNode body = om.readTree(res.getResponse().getContentAsString());
+        return body.get("accessToken").asText();
+    }
+
+    private long createBoat(String name, String description, String type, String length) throws Exception {
+        var res = mockMvc.perform(post(API_BOATS)
+                        .header("Authorization", bearer)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsBytes(Map.of(
+                                "name", name,
+                                "description", description,
+                                "type", type,
+                                "length", length
+                        ))))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.name").value(name))
+                .andReturn();
+
+        return om.readTree(res.getResponse().getContentAsString()).get("id").asLong();
+    }
+
+    private void getBoatAndAssert(long id, String expectedName, String expectedDescription) throws Exception {
+        mockMvc.perform(get(API_BOATS_ID, id)
+                        .header("Authorization", bearer))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.name").value(expectedName))
+                .andExpect(jsonPath("$.description").value(expectedDescription));
+    }
+
+    private void updateBoat(long id, String newName, String newDescription, String newType, String newLength) throws Exception {
+        mockMvc.perform(put(API_BOATS_ID, id)
+                        .header("Authorization", bearer)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsBytes(Map.of(
+                                "name", newName,
+                                "description", newDescription,
+                                "type", newType,
+                                "length", newLength
+                        ))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(newName))
+                .andExpect(jsonPath("$.description").value(newDescription))
+                .andExpect(jsonPath("$.type").value(newType))
+                .andExpect(jsonPath("$.length").value(newLength));
+    }
+
+    private void deleteBoat(long id) throws Exception {
+        mockMvc.perform(delete(API_BOATS_ID, id)
+                        .header("Authorization", bearer))
+                .andExpect(status().isNoContent());
     }
 }
