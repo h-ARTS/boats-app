@@ -16,7 +16,6 @@ import { BoatList } from '../boats/components/boat-list/boat-list.component';
   imports: [MatCardModule, MatButtonModule, MatIconModule, BoatList],
 })
 export class HomePage {
-  private boatService = inject(BoatService);
   private router = inject(Router);
   private auth = inject(AuthService);
 
