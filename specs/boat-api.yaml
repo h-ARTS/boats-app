@@ -13,7 +13,7 @@ paths:
                 username: { type: string, minLength: 2 },
                 password: { type: string, minLength: 8, maxLength: 16 }
               },
-              required: true
+              required: [username,password]
             }
           }
         }
@@ -35,11 +35,23 @@ paths:
       responses: { "201": { description: Created } }
   /api/boats/{id}:
     get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       security: [ { bearerAuth: [ ] } ]
       responses:
         "200": { description: Boat }
         "404": { description: "Boat not found." }
     put:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       security: [ { bearerAuth: [ ] } ]
       requestBody:
         content:
@@ -51,6 +63,12 @@ paths:
         "400": { description: "Boat not found." }
         "404": { description: "Boat not found." }
     delete:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       security: [ { bearerAuth: [ ] } ]
       responses:
         "204": { description: None }
