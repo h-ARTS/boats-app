@@ -23,7 +23,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 public class BoatsIT {
 
-    public static final String API_BOATS_ID = "/api/boats/{id}";
     @Autowired
     MockMvc mockMvc;
     @Autowired
@@ -33,8 +32,9 @@ public class BoatsIT {
 
     private static final String USERNAME = "admin";
     private static final String PASSWORD = "123456789";
-    public static final String API_AUTH_LOGIN = "/api/auth/login";
-    public static final String API_BOATS = "/api/boats";
+    private static final String API_AUTH_LOGIN = "/api/auth/login";
+    private static final String API_BOATS = "/api/boats";
+    public static final String API_BOATS_ID = "/api/boats/{id}";
 
     @BeforeEach
     void authenticate() throws Exception {
