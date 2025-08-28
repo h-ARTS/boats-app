@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { AUTH_LOGIN } from '../types';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -9,7 +10,7 @@ export class AuthService {
 
   login(username: string, password: string): Observable<any> {
     return this.http
-      .post('/api/auth/login', { username, password })
+      .post(AUTH_LOGIN, { username, password })
       .pipe(tap((res: any) => localStorage.setItem(this.tokenKey, res.accessToken)));
   }
 

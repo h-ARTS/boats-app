@@ -1,0 +1,49 @@
+<div class="action-buttons">
+  <button mat-stroked-button color="secondary" (click)="goToAdd()">
+    <mat-icon>add</mat-icon> Add Boat
+  </button>
+
+  <button mat-stroked-button color="warn" (click)="logout()">
+    <mat-icon>logout</mat-icon>
+    Logout
+  </button>
+</div>
+
+<mat-card appearance="outlined">
+  <mat-card-header>
+    <h2>Boats Overview</h2>
+  </mat-card-header>
+  <mat-card-content>
+    <table mat-table [dataSource]="boats()" class="mat-elevation-z8">
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let boat">
+          <span (click)="goToDetail(boat.id)" style="cursor: pointer; text-decoration: underline">{{
+            boat.name
+          }}</span>
+        </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let boat">
+          <button mat-icon-button color="primary" (click)="goToEdit(boat.id)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteBoat(boat.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+
+    @if (boats().length === 0) {
+    <div class="no-boats-message">No boats found.</div>
+    }
+  </mat-card-content>
+</mat-card>

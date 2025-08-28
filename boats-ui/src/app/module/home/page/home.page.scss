@@ -1,0 +1,28 @@
+mat-card {
+  max-width: 600px;
+  margin: 1rem auto 2rem;
+}
+
+mat-card-header {
+  display: flex;
+  flex-direction: column;
+
+  padding: 2rem 2rem 0;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  max-width: 600px;
+  margin: 2rem auto 0;
+}
+
+mat-card-content {
+  padding: 0;
+  margin-bottom: 1rem;
+}
+
+.no-boats-message {
+  text-align: center;
+  margin-top: 2rem;
+}

@@ -254,3 +254,6 @@ export const POST_BOATS = '/api/boats' as const satisfies keyof paths;
 export const GET_BOAT = '/api/boats/{id}' as const satisfies keyof paths;
 export const PUT_BOAT = '/api/boats/{id}' as const satisfies keyof paths;
 export const DELETE_BOAT = '/api/boats/{id}' as const satisfies keyof paths;
+
+export type Boat = components['schemas']['Boat'];
+export type BoatUpsert = components['schemas']['BoatUpsert'];
